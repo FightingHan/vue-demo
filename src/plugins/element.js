@@ -13,7 +13,10 @@ import {
     Menu, 
     Submenu, 
     MenuItemGroup, 
-    MenuItem 
+    MenuItem, 
+    Breadcrumb, 
+    BreadcrumbItem, 
+    Card
 } from 'element-ui'
 
 Vue.use(Button)
@@ -29,5 +32,8 @@ Vue.use(Menu)
 Vue.use(Submenu)
 Vue.use(MenuItem)
 Vue.use(MenuItemGroup)
+Vue.use(Breadcrumb)
+Vue.use(BreadcrumbItem)
+Vue.use(Card)
 //挂载到原型对象上，可以使用this访问
 Vue.prototype.$message = Message;

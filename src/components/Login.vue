@@ -36,8 +36,8 @@ export default {
     return {
       //登陆表单的数据绑定对象
       loginForm: {
-        username: '',
-        password: ''
+        username: 'admin',
+        password: '123456'
       },
       //这是表单的验证数据
       loginFormRules: {
@@ -59,6 +59,7 @@ export default {
       this.$refs.loginFormRef.resetFields()
     },
     login() {
+      //第一个参数vaild默认为验证的结果
       this.$refs.loginFormRef.validate(valid => {
         if (!valid) return
         //向服务器端发送请求测试
@@ -69,7 +70,7 @@ export default {
           this.$message.success('登录成功！，欢迎使用系统！')
           //将token存储在seesion中
           window.sessionStorage.setItem('token', res.data.token)
-          //进行也米娜的跳转
+          //进行界面的跳转，加入到界面栈中
           this.$router.push('/home')
         })
       })

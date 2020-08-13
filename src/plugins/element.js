@@ -16,7 +16,15 @@ import {
     MenuItem, 
     Breadcrumb, 
     BreadcrumbItem, 
-    Card
+    Card,
+    Row, 
+    Col, 
+    Table, 
+    TableColumn, 
+    Switch, 
+    Tooltip, 
+    Pagination, 
+    Dialog
 } from 'element-ui'
 
 Vue.use(Button)
@@ -35,5 +43,18 @@ Vue.use(MenuItemGroup)
 Vue.use(Breadcrumb)
 Vue.use(BreadcrumbItem)
 Vue.use(Card)
+//栅格系统
+Vue.use(Row)
+Vue.use(Col)
+//表格
+Vue.use(Table)
+Vue.use(TableColumn)
+
+Vue.use(Switch)
+Vue.use(Tooltip)
+//分页
+Vue.use(Pagination)
+//对话框
+Vue.use(Dialog)
 //挂载到原型对象上，可以使用this访问
 Vue.prototype.$message = Message;

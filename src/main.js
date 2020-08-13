@@ -14,7 +14,6 @@ axios.defaults.baseURL = 'http://timemeetyou.com:8889/api/private/v1/';
 //请求拦截器，每次请求前会调用该函数进行请求的拦截
 //相当于一个预处理的过程，预处理我们的请求
 axios.interceptors.request.use(config => {
-  console.log(config);
   config.headers.Authorization = window.sessionStorage.getItem('token')
   return config;
 

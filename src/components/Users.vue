@@ -1,7 +1,7 @@
 <template>
   <div>
     <el-breadcrumb separator-class="el-icon-arrow-right">
-      <el-breadcrumb-item :to="{ path : '/home'}">首页</el-breadcrumb-item>
+      <el-breadcrumb-item :to="{ path: '/home' }">首页</el-breadcrumb-item>
       <el-breadcrumb-item>用户管理</el-breadcrumb-item>
       <el-breadcrumb-item>用户列表</el-breadcrumb-item>
     </el-breadcrumb>
@@ -9,8 +9,17 @@
       <!--搜索框与搜索按钮-->
       <el-row :gutter="20">
         <el-col :span="7">
-          <el-input placeholder="请输入搜索的内容" clearable v-model="queryInfo.query" class="input-with-select">
-            <el-button slot="append" icon="el-icon-search" @click="getUserList()"></el-button>
+          <el-input
+            placeholder="请输入搜索的内容"
+            clearable
+            v-model="queryInfo.query"
+            class="input-with-select"
+          >
+            <el-button
+              slot="append"
+              icon="el-icon-search"
+              @click="getUserList()"
+            ></el-button>
           </el-input>
         </el-col>
         <el-col :span="4">
@@ -26,7 +35,10 @@
         <el-table-column label="状态">
           <!--scope就是当前的对象-->
           <template v-slot="scope">
-            <el-switch v-model="scope.row.mg_state" @change="userStatusChange(scope.row)"></el-switch>
+            <el-switch
+              v-model="scope.row.mg_state"
+              @change="userStatusChange(scope.row)"
+            ></el-switch>
           </template>
         </el-table-column>
         <el-table-column label="角色" prop="role_name"></el-table-column>
@@ -41,10 +53,23 @@
             ></el-button>
             <!-- 删除 -->
 
-            <el-button size="mini" type="danger" icon="el-icon-delete"></el-button>
+            <el-button
+              size="mini"
+              type="danger"
+              icon="el-icon-delete"
+            ></el-button>
             <!--分配角色按钮-->
-            <el-tooltip placement="top" effect="dark" content="分配角色" :enterable="false">
-              <el-button size="mini" type="warning" icon="el-icon-setting"></el-button>
+            <el-tooltip
+              placement="top"
+              effect="dark"
+              content="分配角色"
+              :enterable="false"
+            >
+              <el-button
+                size="mini"
+                type="warning"
+                icon="el-icon-setting"
+              ></el-button>
             </el-tooltip>
           </template>
         </el-table-column>
@@ -60,9 +85,7 @@
         :total="total"
       ></el-pagination>
       <!--添加用户对话框-->
-      <el-dialog title="添加用户" :visible.sync="dialogVisible">
-
-      </el-dialog>
+      <el-dialog title="添加用户" :visible.sync="addDialogVisible"> </el-dialog>
     </el-card>
   </div>
 </template>
@@ -79,7 +102,8 @@ export default {
         pagesize: 2
       },
       userList: [],
-      total: 0
+      total: 0,
+      addDialogVisible: false
     }
   },
   created() {
@@ -109,17 +133,18 @@ export default {
       this.getUserList()
     },
     async userStatusChange(userInfo) {
-      this.$message.closeAll();
-      const {data: res} = await this.$http.put(`users/${userInfo.id}/state/${userInfo.mg_state}`)
-      if(res.meta.status !== 200) {
-        userInfo.mg_state = !userInfo.mg_state;
-        return this.$message.error("更新用户状态失败")
+      this.$message.closeAll()
+      const { data: res } = await this.$http.put(
+        `users/${userInfo.id}/state/${userInfo.mg_state}`
+      )
+      if (res.meta.status !== 200) {
+        userInfo.mg_state = !userInfo.mg_state
+        return this.$message.error('更新用户状态失败')
       }
-      this.$message.success("更新状态成功！")
+      this.$message.success('更新状态成功！')
     }
   }
 }
 </script>
 
-<style lang="less" scoped>
-</style>
+<style lang="less" scoped></style>

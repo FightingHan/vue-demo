@@ -23,7 +23,9 @@
           </el-input>
         </el-col>
         <el-col :span="4">
-          <el-button type="primary">添加用户</el-button>
+          <el-button type="primary" @click="addDialogVisible = true"
+            >添加用户</el-button
+          >
         </el-col>
       </el-row>
       <!--数据区-->
@@ -85,7 +87,57 @@
         :total="total"
       ></el-pagination>
       <!--添加用户对话框-->
-      <el-dialog title="添加用户" :visible.sync="addDialogVisible"> </el-dialog>
+      <el-dialog
+        title="添加用户"
+        :visible.sync="addDialogVisible"
+        @close="addUserDialogClose"
+      >
+        <span>
+          <el-form
+            ref="addUserFormRef"
+            :model="addUserForm"
+            :rules="addUserFormRules"
+            label-width="90px"
+            class="user_form"
+          >
+            <!--用户名-->
+            <el-form-item label="username" prop="username">
+              <el-input
+                v-model="addUserForm.username"
+                prefix-icon="el-icon-user"
+              ></el-input>
+            </el-form-item>
+            <!--密码-->
+            <el-form-item label="password" prop="password">
+              <el-input
+                v-model="addUserForm.password"
+                type="password"
+                prefix-icon="el-icon-lock"
+              ></el-input>
+            </el-form-item>
+            <el-form-item label="email" prop="email">
+              <el-input
+                v-model="addUserForm.email"
+                type="email"
+                prefix-icon="el-icon-gmail"
+              ></el-input>
+            </el-form-item>
+            <el-form-item label="mobile" prop="mobile">
+              <el-input
+                v-model="addUserForm.mobile"
+                type="number"
+                prefix-icon="el-icon-mobile"
+              ></el-input>
+            </el-form-item>
+          </el-form>
+        </span>
+        <span slot="footer" class="dialog-footer">
+          <el-button @click="addDialogVisible = false">
+            cancel
+          </el-button>
+          <el-button @click="addUser" type="primary">ensure</el-button>
+        </span>
+      </el-dialog>
     </el-card>
   </div>
 </template>
@@ -93,6 +145,22 @@
 <script>
 export default {
   data() {
+    //vaildate for email
+    var checkEmail = (rule, value, cb) => {
+      const regEmail = /^[a-zA-Z0-9_-]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/
+      if (regEmail.test(value)) {
+        return cb()
+      }
+      cb(new Error('email address is no valid'))
+    }
+    //vaildate for mobile
+    var checkMobile = (rule, value, cb) => {
+      const regMobile = /^((13[0-9])|(15[^4,\d])|(18[0,2,5-9])|(147))\d{8}$/
+      if (regMobile.test(value)) {
+        return cb()
+      }
+      cb(new Error('mobile is no valid'))
+    }
     return {
       input: '',
       //获取用户列表的参数
@@ -103,7 +171,66 @@ export default {
       },
       userList: [],
       total: 0,
-      addDialogVisible: false
+      addDialogVisible: false,
+      //add user info
+      addUserForm: {
+        username: '',
+        password: '',
+        email: '',
+        mobile: ''
+      },
+      //validitate for add user info
+      addUserFormRules: {
+        username: [
+          {
+            required: true,
+            meaasge: 'please input username',
+            trigger: 'blur'
+          },
+          {
+            min: 3,
+            max: 10,
+            meaasge: 'please keep the length between 3 and 10',
+            trigger: 'blur'
+          }
+        ],
+        password: [
+          {
+            required: true,
+            message: 'please input password',
+            trigger: 'blur'
+          },
+          {
+            min: 6,
+            max: 12,
+            trigger: 'blur'
+          }
+        ],
+        mobile: [
+          {
+            required: true,
+            message: 'please input mobile',
+            trigger: 'blur'
+          },
+          {
+            //use my validate rules
+            validator: checkMobile,
+            trigger: 'blur'
+          }
+        ],
+        email: [
+          {
+            required: true,
+            message: 'please input email',
+            trigger: 'blur'
+          },
+          {
+            //use my validate rules
+            validator: checkEmail,
+            trigger: 'blur'
+          }
+        ]
+      }
     }
   },
   created() {
@@ -118,7 +245,6 @@ export default {
         return this.$message.error('获取用户列表失败')
       this.userList = res.data.users
       this.total = res.data.total
-      console.log(res)
     },
     //监听最新的pageSize改变
     handleSizeChange(newSize) {
@@ -142,6 +268,25 @@ export default {
         return this.$message.error('更新用户状态失败')
       }
       this.$message.success('更新状态成功！')
+    },
+    //reset userInfo form
+    addUserDialogClose() {
+      this.$refs.addUserFormRef.resetFields()
+    },
+    addUser() {
+      this.$refs.addUserFormRef.validate(async valid => {
+        if (valid) {
+          const { data: res } = await this.$http.post('users', this.addUserForm)
+          res.meta.status !== 201
+            ? this.$message.error(res.meta.msg)
+            : this.$message.success('add user successd!!! ')
+          console.log(res)
+          //close the dialog
+          this.addDialogVisible = false
+          //refresh userList data
+          this.getUserList()
+        } else return
+      })
     }
   }
 }

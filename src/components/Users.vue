@@ -51,7 +51,7 @@
               size="mini"
               type="primary"
               icon="el-icon-edit"
-              @click="updateUser(scope.row.id)"
+              @click="showEditDialog(scope.row.id)"
             ></el-button>
             <!-- 删除 -->
 
@@ -79,9 +79,9 @@
       <!--分页区-->
       <el-pagination
         @size-change="handleSizeChange"
-        @Current-change="handleCurrentChange"
+        @current-change="handleCurrentChange"
         :current-page="queryInfo.pagenum"
-        :page-sizes="[1, 2, 3, 4]"
+        :page-sizes="[1, 2, 3, 4, 5, 6, 7, 8]"
         :page-size="queryInfo.pagesize"
         layout="total, sizes, prev, pager, next, jumper"
         :total="total"
@@ -98,7 +98,6 @@
             :model="addUserForm"
             :rules="addUserFormRules"
             label-width="90px"
-            class="user_form"
           >
             <!--用户名-->
             <el-form-item label="username" prop="username">
@@ -125,7 +124,6 @@
             <el-form-item label="mobile" prop="mobile">
               <el-input
                 v-model="addUserForm.mobile"
-                type="number"
                 prefix-icon="el-icon-mobile"
               ></el-input>
             </el-form-item>
@@ -136,6 +134,50 @@
             cancel
           </el-button>
           <el-button @click="addUser" type="primary">ensure</el-button>
+        </span>
+      </el-dialog>
+
+      <!--edit user info dialog-->
+      <el-dialog
+        title="edit user info"
+        :visible.sync="editDialogVisible"
+        @close="editUserDialogClose"
+      >
+        <span>
+          <el-form
+            ref="editUserFormRef"
+            :model="editUserForm"
+            :rules="addUserFormRules"
+            label-width="90px"
+          >
+            <!--用户名-->
+            <el-form-item label="username">
+              <el-input
+                v-model="editUserForm.username"
+                prefix-icon="el-icon-user"
+                disabled
+              ></el-input>
+            </el-form-item>
+            <el-form-item label="email" prop="email">
+              <el-input
+                v-model="editUserForm.email"
+                type="email"
+                prefix-icon="el-icon-gmail"
+              ></el-input>
+            </el-form-item>
+            <el-form-item label="mobile" prop="mobile">
+              <el-input
+                v-model="editUserForm.mobile"
+                prefix-icon="el-icon-mobile"
+              ></el-input>
+            </el-form-item>
+          </el-form>
+        </span>
+        <span slot="footer" class="dialog-footer">
+          <el-button @click="editDialogVisible = false">
+            cancel
+          </el-button>
+          <el-button @click="editUser" type="primary">ensure</el-button>
         </span>
       </el-dialog>
     </el-card>
@@ -155,7 +197,7 @@ export default {
     }
     //vaildate for mobile
     var checkMobile = (rule, value, cb) => {
-      const regMobile = /^((13[0-9])|(15[^4,\d])|(18[0,2,5-9])|(147))\d{8}$/
+      const regMobile = /^((\+|00)86)?((134\d{4})|((13[0-3|5-9]|14[1|5-9]|15[0-9]|16[2|5|6|7]|17[0-8]|18[0-9]|19[0-2|5-9])\d{8}))$/
       if (regMobile.test(value)) {
         return cb()
       }
@@ -167,7 +209,7 @@ export default {
       queryInfo: {
         query: '',
         pagenum: 1,
-        pagesize: 2
+        pagesize: 8
       },
       userList: [],
       total: 0,
@@ -230,7 +272,10 @@ export default {
             trigger: 'blur'
           }
         ]
-      }
+      },
+      //edit user INfo
+      editDialogVisible: false,
+      editUserForm: {}
     }
   },
   created() {
@@ -254,8 +299,8 @@ export default {
     },
     //监听页码值 改变的事件
     handleCurrentChange(newPage) {
-      this.queryInfo.pagenum = newPage
       console.log(newPage)
+      this.queryInfo.pagenum = newPage
       this.getUserList()
     },
     async userStatusChange(userInfo) {
@@ -286,6 +331,39 @@ export default {
           //refresh userList data
           this.getUserList()
         } else return
+      })
+    },
+    async showEditDialog(id) {
+      const { data: res } = await this.$http.get('users/' + id)
+      if (res.meta.status !== 200) {
+        return this.$message.error('search user failed')
+      }
+      this.editUserForm = res.data
+      this.editDialogVisible = true
+    },
+    editUserDialogClose() {
+      this.$refs.editUserFormRef.resetFields()
+    },
+    //edit user info and commit
+    editUser() {
+      this.$refs.editUserFormRef.validate(async valid => {
+        if (!valid) return
+        const { data: res } = await this.$http.put(
+          'users/' + this.editUserForm.id,
+          {
+            email: this.editUserForm.email,
+            mobile: this.editUserForm.mobile
+          }
+        )
+        if (res.meta.status !== 200) {
+          return this.$message.error(res.meta.msg)
+        }
+
+        this.editDialogVisible = false
+
+        this.getUserList()
+
+        this.$message.success('update user info is successed!!')
       })
     }
   }

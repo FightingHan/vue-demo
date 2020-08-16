@@ -1,30 +1,31 @@
 import Vue from 'vue'
-import { 
-    Button, 
-    Form, 
-    FormItem, 
-    Input, 
-    Message, 
-    Container, 
-    Header, 
-    Aside, 
-    Main, 
-    Footer, 
-    Menu, 
-    Submenu, 
-    MenuItemGroup, 
-    MenuItem, 
-    Breadcrumb, 
-    BreadcrumbItem, 
+import {
+    Button,
+    Form,
+    FormItem,
+    Input,
+    Message,
+    Container,
+    Header,
+    Aside,
+    Main,
+    Footer,
+    Menu,
+    Submenu,
+    MenuItemGroup,
+    MenuItem,
+    Breadcrumb,
+    BreadcrumbItem,
     Card,
-    Row, 
-    Col, 
-    Table, 
-    TableColumn, 
-    Switch, 
-    Tooltip, 
-    Pagination, 
-    Dialog
+    Row,
+    Col,
+    Table,
+    TableColumn,
+    Switch,
+    Tooltip,
+    Pagination,
+    Dialog,
+    MessageBox,
 } from 'element-ui'
 
 Vue.use(Button)
@@ -43,18 +44,19 @@ Vue.use(MenuItemGroup)
 Vue.use(Breadcrumb)
 Vue.use(BreadcrumbItem)
 Vue.use(Card)
-//栅格系统
+    //栅格系统
 Vue.use(Row)
 Vue.use(Col)
-//表格
+    //表格
 Vue.use(Table)
 Vue.use(TableColumn)
 
 Vue.use(Switch)
 Vue.use(Tooltip)
-//分页
+    //分页
 Vue.use(Pagination)
-//对话框
+    //对话框
 Vue.use(Dialog)
-//挂载到原型对象上，可以使用this访问
+    //挂载到原型对象上，可以使用this访问
 Vue.prototype.$message = Message;
+Vue.prototype.$confirm = MessageBox.confirm

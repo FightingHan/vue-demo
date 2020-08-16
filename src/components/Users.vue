@@ -58,6 +58,7 @@
             <el-button
               size="mini"
               type="danger"
+              @click="removeUserById(scope.row.id)"
               icon="el-icon-delete"
             ></el-button>
             <!--分配角色按钮-->
@@ -303,6 +304,7 @@ export default {
       this.queryInfo.pagenum = newPage
       this.getUserList()
     },
+    //show addUserINfo dialog
     async userStatusChange(userInfo) {
       this.$message.closeAll()
       const { data: res } = await this.$http.put(
@@ -314,10 +316,11 @@ export default {
       }
       this.$message.success('更新状态成功！')
     },
-    //reset userInfo form
+    //reset adduserInfo form
     addUserDialogClose() {
       this.$refs.addUserFormRef.resetFields()
     },
+    //add userINfo and commmit
     addUser() {
       this.$refs.addUserFormRef.validate(async valid => {
         if (valid) {
@@ -333,6 +336,7 @@ export default {
         } else return
       })
     },
+    //show editUserINfo dialog
     async showEditDialog(id) {
       const { data: res } = await this.$http.get('users/' + id)
       if (res.meta.status !== 200) {
@@ -341,6 +345,7 @@ export default {
       this.editUserForm = res.data
       this.editDialogVisible = true
     },
+    //reset edituserInfo form
     editUserDialogClose() {
       this.$refs.editUserFormRef.resetFields()
     },
@@ -365,6 +370,29 @@ export default {
 
         this.$message.success('update user info is successed!!')
       })
+    },
+    //remove user
+    async removeUserById(id) {
+      const confirmResult = await this.$confirm(
+        'this operation will remove user forever, would you want to remove this user? ',
+        'hint',
+        {
+          confirmButtonText: 'ensure',
+          cancelButtonText: 'cancel',
+          type: 'warning'
+        }
+      ).catch(err => err)
+
+      if (confirmResult !== 'cannel') {
+        const { data: res } = await this.$http.delete('users/' + id)
+
+        if (res.meta.status != 200) return this.$message.error(res.meta.msg)
+
+        this.getUserList()
+        this.$message.success('remove user successed!')
+      } else {
+        this.$message.info('you cancel this operation')
+      }
     }
   }
 }

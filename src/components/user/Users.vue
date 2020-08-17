@@ -336,7 +336,6 @@ export default {
     },
     //监听页码值 改变的事件
     handleCurrentChange(newPage) {
-      console.log(newPage)
       this.queryInfo.pagenum = newPage
       this.getUserList()
     },
@@ -454,7 +453,7 @@ export default {
         )
       }
       const { data: res } = await this.$http.put(
-        `users/${this.userInfo.id}/role`,
+        'users/' + this.userInfo.id.toString() + '/role',
         {
           rid: this.selectedRoleId
         }

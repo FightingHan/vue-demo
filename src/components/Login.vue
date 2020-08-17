@@ -10,7 +10,6 @@
         ref="loginFormRef"
         :model="loginForm"
         :rules="loginFormRules"
-        label-width="100px"
         class="login_form"
       >
         <!--用户名-->

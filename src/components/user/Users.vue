@@ -119,7 +119,7 @@
               <el-input
                 v-model="addUserForm.email"
                 type="email"
-                prefix-icon="el-icon-gmail"
+                prefix-icon="el-icon-message"
               ></el-input>
             </el-form-item>
             <el-form-item label="mobile" prop="mobile">
@@ -163,7 +163,7 @@
               <el-input
                 v-model="editUserForm.email"
                 type="email"
-                prefix-icon="el-icon-gmail"
+                prefix-icon="el-icon-message"
               ></el-input>
             </el-form-item>
             <el-form-item label="mobile" prop="mobile">

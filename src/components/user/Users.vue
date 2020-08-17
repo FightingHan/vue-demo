@@ -71,6 +71,7 @@
               <el-button
                 size="mini"
                 type="warning"
+                @click="setRole(scope.row)"
                 icon="el-icon-setting"
               ></el-button>
             </el-tooltip>
@@ -181,6 +182,35 @@
           <el-button @click="editUser" type="primary">ensure</el-button>
         </span>
       </el-dialog>
+
+      <!--give roles to user dialog-->
+      <el-dialog
+        title="allocation role"
+        :visible.sync="setRoleDialogVisible"
+        @close="setRoleDialogClose"
+      >
+        <div>
+          <p>user: {{ userInfo.username }}</p>
+          <p>role: {{ userInfo.role_name }}</p>
+          <p>
+            allocation new role:
+            <el-select placeholder="allocation role" v-model="selectedRoleId">
+              <el-option
+                v-for="item in rolesList"
+                :key="item.id"
+                :label="item.roleName"
+                :value="item.id"
+              ></el-option>
+            </el-select>
+          </p>
+        </div>
+        <span slot="footer" class="dialog-footer">
+          <el-button @click="setRoleDialogVisible = false">
+            cancel
+          </el-button>
+          <el-button @click="saveRoleInfo" type="primary">ensure</el-button>
+        </span>
+      </el-dialog>
     </el-card>
   </div>
 </template>
@@ -276,7 +306,13 @@ export default {
       },
       //edit user INfo
       editDialogVisible: false,
-      editUserForm: {}
+      editUserForm: {},
+      //allocation role to user dialog
+      setRoleDialogVisible: false,
+      userInfo: {},
+      rolesList: [],
+      //selectedRoleId
+      selectedRoleId: ''
     }
   },
   created() {
@@ -393,6 +429,42 @@ export default {
       } else {
         this.$message.info('you cancel this operation')
       }
+    },
+    async setRole(userInfo) {
+      this.userInfo = userInfo
+
+      //get all roles first
+      const { data: res } = await this.$http.get('roles')
+      if (res.meta.status !== 200) {
+        return this.$message.error(res.meta.msg)
+      }
+
+      this.rolesList = res.data
+
+      this.setRoleDialogVisible = true
+    },
+    setRoleDialogClose() {
+      this.selectedRoleId = ''
+      this.userInfo = {}
+    },
+    async saveRoleInfo() {
+      if (!this.selectedRoleId) {
+        return this.$message.error(
+          'please choose the role you want to aloocate'
+        )
+      }
+      const { data: res } = await this.$http.put(
+        `users/${this.userInfo.id}/role`,
+        {
+          rid: this.selectedRoleId
+        }
+      )
+
+      if (res.meta.status !== 200) {
+        return this.$message.error(res.meta.msg)
+      }
+      this.getUserList()
+      this.setRoleDialogVisible = false
     }
   }
 }

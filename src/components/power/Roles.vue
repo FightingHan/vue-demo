@@ -56,7 +56,7 @@
               size="mini"
               type="primary"
               icon="el-icon-edit"
-              @click="editRoles(scope.row.id)"
+              @click="editRoleDialogVisible = true"
             ></el-button>
             <el-button
               size="mini"
@@ -73,6 +73,33 @@
           </template>
         </el-table-column>
       </el-table>
+
+      <el-dialog
+        title="edit role info"
+        :visible.sync="editRoleDialogVisible"
+        @close="editRoleDialogClose"
+      >
+        <span>
+          <el-form
+            ref="editRoleFormRef"
+            :model="editRoleForm"
+            :rules="editRoleFormRules"
+            label-width="90px"
+          >
+            <!--用户名-->
+            <el-form-item label="roleName" prop="roleName">
+              <el-input v-model="editRoleForm.roleName" prefix-icon="el-icon-user"></el-input>
+            </el-form-item>
+            <el-form-item label="roleDesc" prop="roleDesc">
+              <el-input v-model="editRoleForm.roleDesc" prefix-icon="el-icon-chat-line-square"></el-input>
+            </el-form-item>
+          </el-form>
+        </span>
+        <span slot="footer" class="dialog-footer">
+          <el-button @click="editRoleDialogVisible = false">cancel</el-button>
+          <el-button @click="editRole" type="primary">ensure</el-button>
+        </span>
+      </el-dialog>
     </el-card>
   </div>
 </template>
@@ -82,6 +109,38 @@
 			return {
 				//all role data
 				roleList: [],
+				editRoleForm: {
+					roleDesc: '',
+					roleName: '',
+				},
+				editRoleDialogVisible: false,
+				editRoleFormRules: {
+					roleName: [
+						{
+							required: true,
+							meaasge: 'please input role name',
+							trigger: 'blur',
+						},
+						{
+							min: 3,
+							max: 10,
+							meaasge: 'please keep the length between 3 and 10',
+							trigger: 'blur',
+						},
+					],
+					roleDesc: [
+						{
+							required: true,
+							message: 'please input role Descrition',
+							trigger: 'blur',
+						},
+						{
+							min: 6,
+							max: 20,
+							trigger: 'blur',
+						},
+					],
+				},
 			}
 		},
 		created() {
@@ -96,7 +155,7 @@
 
 				this.roleList = res.data
 			},
-			editRoles(id) {},
+			//remove role
 			async removeRoleById(id) {
 				const confirmResult = await this.$confirm(
 					'this operation will remove role forever, would you want to remove this role? ',
@@ -119,7 +178,14 @@
 					this.$message.info('you cancel this operation')
 				}
 			},
-			settingRoles(id) {},
+			settingRole(id) {},
+			//edit role info
+			editRole(id) {
+				this.editRoleDialogVisible = false
+			},
+			editRoleDialogClose() {
+				this.$refs.editRoleFormRef.resetFields()
+			},
 		},
 	}
 </script>

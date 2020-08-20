@@ -32,8 +32,8 @@
 
         <!--order column-->
         <template #order="scope">
-          <el-tag v-if="scope.row.cat_level === 1" type="success">level1</el-tag>
-          <el-tag v-else-if="scope.row.cat_level === 0">level2</el-tag>
+          <el-tag v-if="scope.row.cat_level === 1" type="success">level2</el-tag>
+          <el-tag v-else-if="scope.row.cat_level === 0">level1</el-tag>
           <el-tag v-else-if="scope.row.cat_level === 2" type="warning">level3</el-tag>
         </template>
         <template #opt="scope">
@@ -68,12 +68,20 @@
         </el-form-item>
 
         <el-form-item label="cate name">
-          
+          <el-cascader
+            expand-trigger="hover"
+            :options="parentCateList"
+            v-model="selectedKeys"
+            :props="cascaderProps"
+            @change="parentCateChange"
+            clearable
+            change-on-select
+          ></el-cascader>
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
         <el-button @click="addCateDialogVisible = false">cancel</el-button>
-        <el-button @click="addCateDialogVisible = false" type="primary">ensure</el-button>
+        <el-button @click="addCate" type="primary">ensure</el-button>
       </span>
     </el-dialog>
   </div>
@@ -123,14 +131,47 @@
 				},
 				addCateForm: {
 					cat_name: '',
-        },
-        parentCateList: []
+					cat_pid: '',
+					cat_level: '',
+				},
+				parentCateList: [],
+				cascaderProps: {
+					value: 'cat_id',
+					label: 'cat_name',
+					children: 'children',
+				},
+				selectedKeys: [],
 			}
 		},
 		created() {
 			this.getCateList()
 		},
 		methods: {
+			addCate() {
+				this.$refs.addCateFormRef.validate( async valid => {
+					if(!valid) return
+					const {data : res } = await this.$http.post('categories', this.addCateForm)
+					console.log(res)
+					if( res.meta.status !== 201)
+						return this.$message.error(res.meta.msg)
+
+					this.$message.success('添加分类成功')
+					this.addCateDialogVisible = false
+					this.getCateList()
+				})
+			},
+			parentCateChange() {
+				if (this.selectedKeys.length > 0) {
+					this.addCateForm.cat_pid = this.selectedKeys[
+						this.selectedKeys.length - 1
+					]
+					this.addCateForm.cat_level = this.selectedKeys.length
+				} else {
+					this.$message.error('请至少选择一项分类提交')
+					this.addCateForm.cat_level = 0
+					this.addCateForm.cat_pid = 0
+				}
+			},
 			async getCateList() {
 				const { data: res } = await this.$http.get('categories', {
 					params: this.queryInfo,
@@ -157,23 +198,25 @@
 			addCateDialogClose() {
 				this.addCateDialogVisible = false
 				this.$refs.addCateFormRef.resetFields()
+				this.selectedKeys = []
+				this.addCateForm.cat_level = 0
+				this.addCateForm.cat_pid = 0
 			},
 			showEditCateDialog() {
-        //get Parent categries list
-        this.getParentCateList()
+				//get Parent categries list
+				this.getParentCateList()
 				this.addCateDialogVisible = true
 			},
 			async getParentCateList() {
 				const { data: res } = await this.$http.get('categories', {
 					params: {
-            type: 2
-          }
+						type: 2,
+					},
 				})
 				if (res.meta.status !== 200) {
-					return this.$message.error('get goods categories is failed')
-        }
-        this.parentCateList = res.data
-
+					return this.$message.error(res.meta.msg)
+				}
+				this.parentCateList = res.data
 			},
 		},
 	}
